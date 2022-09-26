@@ -11,7 +11,6 @@ public class SpawnManager : MonoBehaviour
     public DayCycle dayCycleRef;
     [SerializeField] List<Enemy> currentEnemies = new List<Enemy>();
     [SerializeField] List<Enemy> spawnableEnemies = new List<Enemy>();
-    List<Enemy> notSpawnableEnemies = new List<Enemy>();
     private float currentOddsMax;
 
     private void Start()
@@ -85,17 +84,23 @@ public class SpawnManager : MonoBehaviour
         float previousValue = 0f; //this will allow us to 
         for (int i = 0; i < spawnableEnemies.Count; i++)
         {
-          //this takes the current spawnrate + the previous spawn rate to define a top end then takes the previous spawn rate as a bottom end, that way we don't double up
+          //this takes the current spawnrate + the previous combined spawn rates to define a top end and bottom end
           if (randomSpawn <= spawnableEnemies[i].spawnRate + previousValue && randomSpawn > previousValue) 
           {     //if (random > current + previous && random < previous )
-                Instantiate(spawnableEnemies[i], this.transform);
-                currentEnemies.Add(spawnableEnemies[i]);
+                currentEnemies.Add(Instantiate(spawnableEnemies[i], this.transform));
           }
             previousValue += spawnableEnemies[i].spawnRate;
         }
         if(currentEnemies.Count == 0) //this is for debugging purposes remove later
         {
             Debug.Log("The float generated weird nothing spawned");
+        }
+    }
+    public void UpdateEnemySpawns() 
+    {
+        for(int i = 0; i < currentEnemies.Count; i++) 
+        {
+            currentEnemies[i].UpdateStats(dayCycleRef);
         }
     }
 }
